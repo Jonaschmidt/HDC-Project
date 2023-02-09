@@ -1,5 +1,5 @@
 '''
-created by Jonas Schmidt on 2/8/2023s
+created by Jonas Schmidt on 2/8/2023
 '''
 
 import math
@@ -20,6 +20,7 @@ alphabet = {'a':[],'b':[],'c':[],'d':[],'e':[],
 # keeps track of generated 1's to prove randomness of vector generation
 ratio_track = 0
 
+### generating hypervectors for atomic elements
 # generate a hyper vector to assign to each dictionary entry of alphabet
 for letter in alphabet:
     hypervector = []
@@ -38,4 +39,10 @@ for letter in alphabet:
 
 print("ratio of all calculated 1's to -1's: ", ratio_track / (len(alphabet) * hypervector_size))
 # ...
+
+### generating hypervectors for n-grams
+sentence = input("Enter a sentence to decompose into n-grams: ")
+
+for s in range(len(sentence) - n_gram_len + 1):
+    print(sentence[s:s + n_gram_len])
 
