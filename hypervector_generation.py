@@ -1,8 +1,8 @@
 '''
-created by Jonas Schmidt on 2/8/2023
+created by Jonas Schmidt on 2/8/2023s
 '''
 
-
+import math
 import random
 
 # hyperparameters
@@ -26,11 +26,9 @@ for letter in alphabet:
     for d in range(hypervector_size):
         ran = random.random()
         # 50/50 append a 1 or -1 to hyper_vector:
-        # (could potentially be a way to optimize this)
-        hypervector.append(-1)
-        if ran % 0.5 == ran:
-            hypervector[d] *= (-1)
-            ratio_track += 1
+        hypervector.append(-1 + 2 * math.floor(ran + 0.5))
+
+        ratio_track += math.floor(ran + 0.5)
 
     alphabet.update({letter: hypervector})
 
