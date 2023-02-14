@@ -17,6 +17,8 @@ def rot(vec, rot_amt):
     return rot_vec
 
 
+# encode all elements of n_grams across lexicon lex
+# (ex. rrT + rH + E, where r represents a rotation operation and T,H,E are elements of an n-gram)
 def encode_n_grams(lex, n_grams):
     # for each n-gram in the n_grams dictionary
     for n in n_grams:
@@ -39,7 +41,8 @@ def encode_n_grams(lex, n_grams):
         mult_vecs.clear()
 
 
-# calculate the cosine similarity between vectors a and b
+# calculate the cosine similarity between vectors a and b of equal length
+# (similarity is of [-1, 1] : [opposite, equal], and 0 implies orthogonality)
 def cosine_similarity(a, b):
     return np.dot(a, b)/(norm(a) * norm(b))
 
