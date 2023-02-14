@@ -85,12 +85,10 @@ for s in range(len(sentence) - n_gram_len + 1):
     curr_gram = sentence[s:s + n_gram_len]
     n_grams[curr_gram] = []
 
-#encode_n_grams(alphabet, n_grams)
-
-for n in n_grams:
-    print(n, ":", n_grams[n])
-
 encode_n_grams(alphabet, n_grams)
 
-print(n_grams)
+# print statements...
+for n in n_grams:
+    print(n, ":", n_grams[n])
+# ...
 
