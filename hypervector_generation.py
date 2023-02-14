@@ -5,6 +5,7 @@ created by Jonas Schmidt on 2/8/2023
 import math
 import random
 import numpy as np
+from numpy.linalg import norm
 
 
 # rotate given vector vec by rot_amt to the left
@@ -38,8 +39,12 @@ def encode_n_grams(lex, n_grams):
         mult_vecs.clear()
 
 
+# calculate the cosine similarity between vectors a and b
+def cosine_similarity(a, b):
+    return np.dot(a, b)/(norm(a) * norm(b))
+
 # hyperparameters
-hypervector_size = 1_000
+hypervector_size = 100
 n_gram_len = 3
 
 # alphabet dictionary
