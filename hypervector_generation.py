@@ -6,6 +6,7 @@ import math
 import random
 import numpy as np
 from numpy.linalg import norm
+import re
 
 
 # rotate given vector vec by rot_amt to the left
@@ -85,8 +86,13 @@ print("ratio of all calculated 1's to -1's: ", ratio_track / (len(alphabet) * hy
 ### generating hypervectors for n-grams
 n_grams = {}
 
-# TODO: filter out punctuation, etc.
-sentence = input("Enter a sentence to decompose into n-grams: ").lower().replace(" ", "#")
+# take an input and scrub it
+# (replace space characters and punctuation with "#", replace any resulting duplicate hashmarks ("##", "###", "####") with single ("#"))
+sentence = input("Enter a sentence to decompose into n-grams: ").lower()
+sentence = re.sub(r'[^\w\s]'," ",sentence)
+sentence = sentence.replace(" ", "#")
+sentence = sentence.replace("###", "#")
+sentence = sentence.replace("##", "#")
 
 # generate a dictionary of n-grams based on input sentence
 for s in range(len(sentence) - n_gram_len + 1):
