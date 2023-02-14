@@ -87,7 +87,7 @@ print("ratio of all calculated 1's to -1's: ", ratio_track / (len(alphabet) * hy
 n_grams = {}
 
 # take an input and scrub it
-# (replace space characters and punctuation with "#", replace any resulting duplicate hashmarks ("##", "###", "####") with single ("#"))
+# (replace space characters and punctuation with "#", replace any resulting duplicate hashmarks ("##", "###", "####", etc.) with single ("#"))
 sentence = input("Enter a sentence to decompose into n-grams: ").lower()
 sentence = re.sub(r'[^\w\s]'," ",sentence)
 sentence = sentence.replace(" ", "#")
