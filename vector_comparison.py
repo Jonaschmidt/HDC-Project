@@ -18,12 +18,12 @@ def cosine_similarity(a, b):
 def hamming_similarity(a, b):
     return hamming(a, b)
 
-# TODO: clean up
+
+# TODO: clean up, add graph labels
 def show_vectors(symbol_space, num_show=64, dim_show=64, ones=1):
     num_sentinel = 0
     dim_sentinel = 0
 
-    # create data
     x = np.arange(0, dim_show)
     y = []
 
@@ -32,11 +32,12 @@ def show_vectors(symbol_space, num_show=64, dim_show=64, ones=1):
     # for every element of symbol_space up to num_show or all available...
     for sym in symbol_space:
 
-        # checks if trying to access outside of the symbol-space
+        # ...check if trying to access outside of the symbol-space
         # if so, breaks
         if num_sentinel >= len(symbol_space):
             break
 
+        # for each bit encoded to symbol, append to y the bit
         for bit in symbol_space[sym]:
             if dim_sentinel >= dim_show:
                 break
@@ -50,11 +51,13 @@ def show_vectors(symbol_space, num_show=64, dim_show=64, ones=1):
 
         dim_sentinel = 0
 
-        ax.scatter(x, y, s=5)
+        # plot each element of y over each x, then clear y for next loop execution
+        ax.scatter(x[0:min(dim_show, len(y))], y, s=1)
         y.clear()
 
         num_sentinel += 1
 
+        # cut off all bits != ones
         ax.set_ybound(0)
 
     plt.show()
