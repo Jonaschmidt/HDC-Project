@@ -5,6 +5,7 @@ created by Jonas Schmidt on 2/15/2023
 import numpy as np
 from numpy.linalg import norm
 from scipy.spatial.distance import hamming
+import matplotlib.pyplot as plt
 
 
 # calculate the cosine similarity between vectors a and b of equal length
@@ -16,4 +17,45 @@ def cosine_similarity(a, b):
 # calculate hamming distance between vectors a and b of equal length
 def hamming_similarity(a, b):
     return hamming(a, b)
+
+# TODO: clean up
+def show_vectors(symbol_space, num_show=64, dim_show=64, ones=1):
+    num_sentinel = 0
+    dim_sentinel = 0
+
+    # create data
+    x = np.arange(0, dim_show)
+    y = []
+
+    fig, ax = plt.subplots()
+
+    # for every element of symbol_space up to num_show or all available...
+    for sym in symbol_space:
+
+        # checks if trying to access outside of the symbol-space
+        # if so, breaks
+        if num_sentinel >= len(symbol_space):
+            break
+
+        for bit in symbol_space[sym]:
+            if dim_sentinel >= dim_show:
+                break
+
+            if bit == ones:
+                y.append(bit + num_sentinel)
+            else:
+                y.append(-1)
+
+            dim_sentinel += 1
+
+        dim_sentinel = 0
+
+        ax.scatter(x, y, s=5)
+        y.clear()
+
+        num_sentinel += 1
+
+        ax.set_ybound(0)
+
+    plt.show()
 
