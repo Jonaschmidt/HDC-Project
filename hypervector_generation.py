@@ -10,7 +10,7 @@ import re
 
 
 # generate a hyper vector to assign to each dictionary entry of a symbol-space
-# e.g., generate a hypervector for each entry of the alphabet if symbol_space is the alphabet
+# e.g., generate a hypervector for each letter of the alphabet if symbol_space is the alphabet
 # @jit(target='GPU')
 def generate_hypervectors(symbol_space, hypervector_size):
     for symbol in symbol_space:
