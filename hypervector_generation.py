@@ -6,12 +6,12 @@ from numba import jit, cuda
 import math
 import random
 import numpy as np
-from numpy.linalg import norm
 import re
+
 
 # generate a hyper vector to assign to each dictionary entry of an alphabet
 #@jit(target='GPU')
-def generate_hypervectors(alphabet):
+def generate_hypervectors(alphabet, hypervector_size):
   for letter in alphabet:
       hypervector = []
       for d in range(hypervector_size):
@@ -35,7 +35,7 @@ def rot(vec, rot_amt):
 # encode all elements of n_grams across lexicon lex
 # (ex. rrT + rH + E, where r represents a rotation operation and T,H,E are elements of an n-gram)
 #@jit(target='GPU')
-def encode_n_grams(lex, n_grams):
+def encode_n_grams(lex, n_grams, n_gram_len):
     # for each n-gram in the n_grams dictionary
     for n in n_grams:
         # create / clear a list, mult_vecs, of vectors to multiply
@@ -56,12 +56,6 @@ def encode_n_grams(lex, n_grams):
         n_grams[n] = list(mult_vecs[-1])
         mult_vecs.clear()
 
-# calculate the cosine similarity between vectors a and b of equal length
-# (similarity is of [-1, 1] : [opposite, equal], and 0 implies orthogonality)
-#@jit(target='GPU')
-def cosine_similarity(a, b):
-    return np.dot(a, b)/(norm(a) * norm(b))
-
 # scrubs a given string as per rules described below:
 '''
 input scrubbing rules:
@@ -74,64 +68,4 @@ def scrub(sentence):
     sentence = sentence.replace(" ", "#")
     sentence = sentence.replace("###", "#")
     return sentence.replace("##", "#")
-
-"""Debugging:
-
----
-
-
-"""
-
-# measure execution time:
-from timeit import default_timer as timer
-
-start = timer()
-
-# hyperparameters
-hypervector_size = 10_000
-n_gram_len = 3
-
-# alphabet dictionary
-alphabet = {'a':[],'b':[],'c':[],'d':[],'e':[],
-            'f':[],'g':[],'h':[],'i':[],'j':[],
-            'k':[],'l':[],'m':[],'n':[],'o':[],
-            'p':[],'q':[],'r':[],'s':[],'t':[],
-            'u':[],'v':[],'w':[],'x':[],'y':[],
-            'z':[],'#':[]}
-num_seed_vectors = len(alphabet)
-
-### generating seed hypervectors for atomic elements
-alphabet = generate_hypervectors(alphabet)
-
-# print statements...
-for letter in alphabet:
-    print(letter, ":", alphabet[letter])
-# ...
-
-### generating hypervectors for n-grams
-n_grams = {}
-
-# user input for debugging:
-'''
-sentence = input("Enter a sentence to decompose into n-grams: ").lower()
-sentence = scrub(sentence)
-'''
-
-# test input for debugging:
-sentence = ("The quick fox jumps over the lazy brown dog").lower()
-sentence = scrub(sentence)
-
-# generate a dictionary of n-grams based on input sentence
-for s in range(len(sentence) - n_gram_len + 1):
-    curr_gram = sentence[s:s + n_gram_len]
-    n_grams[curr_gram] = []
-
-encode_n_grams(alphabet, n_grams)
-
-# print statements...
-for n in n_grams:
-    print(n, ":", n_grams[n])
-# ...
-
-print("time elapsed: ", timer() - start)
 
