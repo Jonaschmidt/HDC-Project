@@ -60,17 +60,16 @@ def encode_n_grams(symbol_space, n_grams, n_gram_len):
         mult_vecs.clear()
 
 
-# scrubs a given string as per rules described below:
-'''
-input scrubbing rules:
-replace space characters and punctuation with "#", 
-replace resulting duplicate hashmarks ("##", "###", "####", etc.) with single ("#")
-'''
+# scrubs a given string as per rules described
 # @jit(target='GPU')
-def scrub(sentence):
-    sentence = sentence.replace(" ", "#")
-    sentence = re.sub(r'[^\w\s]+', "#", sentence)
+def scrub(sentence, default_char='#'):
+    '''
+    input scrubbing rules:
+    replace space characters and punctuation with default_character ('#' by default),
+    replace resulting duplicate default_character with single default_character
+    '''
+    sentence = sentence.replace(" ", default_char)
+    sentence = re.sub(r'[^\w\s]+', default_char, sentence)
     print(sentence)
     return sentence
 
-  
