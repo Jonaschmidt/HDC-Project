@@ -2,7 +2,10 @@
 created by Jonas Schmidt on 2/15/2023
 '''
 
+# TODO: tf implementation
+
 import tensorflow as tf
+import tensorflow_addons as tfa
 import numpy as np
 from numpy.linalg import norm
 from scipy.spatial.distance import hamming
@@ -12,15 +15,18 @@ import matplotlib.pyplot as plt
 # calculate the cosine similarity between vectors a and b of equal length
 # (similarity is of [-1, 1] : [opposite, equal], and 0 implies orthogonality)
 def cosine_similarity(a, b):
-    return np.dot(a, b) / (norm(a) * norm(b))
+    a = tf.convert_to_tensor(a, dtype=tf.float64)
+    b = tf.convert_to_tensor(b, dtype=tf.float64)
+
+    return (tf.tensordot(a, b, 1) / (tf.norm(a) * tf.norm(b))).numpy()
 
 
 # calculate hamming distance between vectors a and b of equal length
 def hamming_similarity(a, b):
-    return hamming(a, b)
+    return tfa.metrics.hamming_distance(a, b).numpy()
 
 
-# TODO: clean up, add graph labels
+# TODO: clean up, add graph labels, tensor implementation (?)
 def show_vectors(symbol_space, num_show=64, dim_show=64, ones=1):
     num_sentinel = 0
     dim_sentinel = 0

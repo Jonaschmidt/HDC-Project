@@ -2,6 +2,8 @@
 created by Jonas Schmidt on 2/8/2023
 '''
 
+# TODO: np.array/tensor implementation
+
 from numba import jit, cuda
 import tensorflow as tf
 import math
@@ -10,21 +12,22 @@ import numpy as np
 import re
 
 
-# generate a seed vector (list) to assign to each dictionary entry of a symbol-space
+# generate a seed vector (tensor) to assign to each dictionary entry of a symbol-space
 # e.g., generate a hypervector for each letter of the alphabet if symbol_space is the alphabet
 # @jit(target='GPU')
 def generate_hypervectors(symbol_space, hypervector_size):
     for symbol in symbol_space:
-        hypervector = []
+        hypervector = np.ones(hypervector_size)
         for d in range(hypervector_size):
             ran = random.random()
             # 50/50 append a 1 or -1 to hyper_vector:
-            hypervector.append(-1 + 2 * math.floor(ran + 0.5))
+            hypervector[d] = (-1 + 2 * math.floor(ran + 0.5))
 
-        symbol_space.update({symbol: hypervector})
+        symbol_space.update({symbol: tf.convert_to_tensor(hypervector)})
     return symbol_space
 
 
+# TODO
 # rotate given vector vec by rot_amt to the left
 # e.g., rot([1,2,3,4], 2) returns [3,4,1,2]
 # @jit(target='GPU')
@@ -36,6 +39,7 @@ def rot(vec, rot_amt):
     return rot_vec
 
 
+# TODO
 # encode all elements of n_grams across symbol_space
 # (ex. rrT + rH + E, where r represents a rotation operation and T,H,E are elements of an n-gram)
 # @jit(target='GPU')
@@ -61,6 +65,7 @@ def encode_n_grams(symbol_space, n_grams, n_gram_len):
         mult_vecs.clear()
 
 
+# TODO
 # scrubs a given string as per rules described
 # @jit(target='GPU')
 def scrub(sentence, default_char='#'):
