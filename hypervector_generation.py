@@ -66,12 +66,11 @@ input scrubbing rules:
 replace space characters and punctuation with "#", 
 replace resulting duplicate hashmarks ("##", "###", "####", etc.) with single ("#")
 '''
-# TODO: improve duplicate hash replacement with regex
 # @jit(target='GPU')
 def scrub(sentence):
-    sentence = re.sub(r'[^\w\s]', "#", sentence)
     sentence = sentence.replace(" ", "#")
-    sentence = sentence.replace("###", "#")
-    return sentence.replace("##", "#")
+    sentence = re.sub(r'[^\w\s]+', "#", sentence)
+    print(sentence)
+    return sentence
 
   
