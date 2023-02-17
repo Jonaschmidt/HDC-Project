@@ -36,7 +36,7 @@ num_seed_vectors = len(alphabet)
 
 print("ENCODING SYMBOL-SPACE...")
 ### generating seed hypervectors for atomic elements
-alphabet = hgen.generate_hypervectors(alphabet, hypervector_size)
+alphabet = hgen_tf.generate_hypervectors(alphabet, hypervector_size)
 print("SYMBOL-SPACE ENCODED\n")
 
 # print statements...
@@ -58,7 +58,7 @@ sentence = hgen.scrub(sentence)
 print("SCRUBBING SENTENCE...")
 # test input for debugging:
 sentence = ("The quick fox jumps over the lazy brown dog").lower()
-sentence = hgen.scrub(sentence)
+sentence = hgen_tf.scrub(sentence)
 print("SENTENCE SCRUBBED:", sentence, "\n")
 
 
@@ -68,7 +68,7 @@ for s in range(len(sentence) - n_gram_len + 1):
     n_grams[curr_gram] = []
 
 print("ENCODING N-GRAMS...")
-hgen.encode_n_grams(alphabet, n_grams, n_gram_len)
+hgen_tf.encode_n_grams(alphabet, n_grams, n_gram_len)
 print("N-GRAMS ENCODED\n")
 
 # print statements...
@@ -86,10 +86,8 @@ vcomp.show_vectors(n_grams, dim_show=100, ones=1)
 # ...
 
 # other vcomp/vcomp_tf functions demonstration...
-
-print("Cosine similarity of hypervectors associated with \'a\' and \'b\':", vcomp.cosine_similarity(alphabet['a'], alphabet['b']), "\n")
-print("Hamming distance of of hypervectors associated with \'a\' and \'b\':", vcomp.hamming_similarity(alphabet['a'], alphabet['b']))
-
+print("Cosine similarity of hypervectors associated with \'a\' and \'b\':", vcomp_tf.cosine_similarity(alphabet['a'], alphabet['b']), "\n")
+print("Hamming distance of of hypervectors associated with \'a\' and \'b\':", vcomp_tf.hamming_similarity(alphabet['a'], alphabet['b']))
 # ...
 
 print("TIME ELAPSED:", timer() - start, "s")

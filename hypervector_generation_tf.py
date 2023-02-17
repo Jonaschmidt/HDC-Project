@@ -2,8 +2,6 @@
 created by Jonas Schmidt on 2/17/2023
 '''
 
-# TODO: np.array/tensor implementation
-
 from numba import jit, cuda
 import tensorflow as tf
 import math
@@ -27,16 +25,18 @@ def generate_hypervectors(symbol_space, hypervector_size):
     return symbol_space
 
 
-# TODO
+# TODO: keep the inputs as tensors, do better
 # rotate given vector vec by rot_amt to the left
 # e.g., rot([1,2,3,4], 2) returns [3,4,1,2]
 # @jit(target='GPU')
 def rot(vec, rot_amt):
+    vec = vec.numpy().tolist()
+
     vec_size = len(vec)
 
     rot_vec = vec[rot_amt % vec_size: vec_size]
     rot_vec.extend(vec[0: rot_amt % vec_size])
-    return rot_vec
+    return tf.convert_to_tensor(rot_vec)
 
 
 # TODO
@@ -63,18 +63,4 @@ def encode_n_grams(symbol_space, n_grams, n_gram_len):
 
         n_grams[n] = list(mult_vecs[-1])
         mult_vecs.clear()
-
-
-# TODO
-# scrubs a given string as per rules described
-# @jit(target='GPU')
-def scrub(sentence, default_char='#'):
-    '''
-    input scrubbing rules:
-    replace space characters and punctuation with default_character ('#' by default),
-    replace resulting duplicate default_character with single default_character
-    '''
-    sentence = sentence.replace(" ", default_char)
-    sentence = re.sub(r'[^\w\s]+', default_char, sentence)
-    return sentence
 
