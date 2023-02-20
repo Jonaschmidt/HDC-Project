@@ -25,21 +25,12 @@ def generate_hypervectors(symbol_space, hypervector_size):
     return symbol_space
 
 
-# rotate given vector vec by rot_amt to the left
-# e.g., rot([1,2,3,4], 2) returns [3,4,1,2]
-# @jit(target='GPU')
-def rot(vec, rot_amt):
-    vec_size = len(vec)
-
-    rot_vec = vec[rot_amt % vec_size: vec_size]
-    rot_vec.extend(vec[0: rot_amt % vec_size])
-    return rot_vec
-
-
 # encode all elements of n_grams across symbol_space
 # (ex. rrT + rH + E, where r represents a rotation operation and T,H,E are elements of an n-gram)
 # @jit(target='GPU')
 def encode_n_grams(symbol_space, n_grams, n_gram_len):
+    ret_n_grams = {}
+
     # for each n-gram in the n_grams dictionary
     for n in n_grams:
         # create / clear a list, mult_vecs, of vectors to multiply
@@ -57,8 +48,10 @@ def encode_n_grams(symbol_space, n_grams, n_gram_len):
         for j in range(len(mult_vecs) - 1):
             mult_vecs[j + 1] = np.multiply(mult_vecs[j], mult_vecs[j + 1])
 
-        n_grams[n] = list(mult_vecs[-1])
+        ret_n_grams[n] = list(mult_vecs[-1])
         mult_vecs.clear()
+
+    return ret_n_grams
 
 
 # scrubs a given string as per rules described
@@ -70,6 +63,27 @@ def scrub(sentence, default_char='#'):
     replace resulting duplicate default_character with single default_character
     '''
     sentence = sentence.replace(" ", default_char)
-    sentence = re.sub(r'[^\w\s]+', default_char, sentence)
+    sentence = re.sub(r'[^\w\s]+', default_char, sentence).lower()
     return sentence
+
+
+# rotate given vector vec by rot_amt to the left
+# e.g., rot([1,2,3,4], 2) returns [3,4,1,2]
+# @jit(target='GPU')
+def rot(vec, rot_amt):
+    vec_size = len(vec)
+
+    rot_vec = vec[rot_amt % vec_size: vec_size]
+    rot_vec.extend(vec[0: rot_amt % vec_size])
+    return rot_vec
+
+
+# sums vectors in a given list
+# @jit(target='GPU')
+def sum(vec_list):
+    for i in range(len(vec_list) - 1):
+        #print(vec_list[i + 1], vec_list[i])
+        vec_list[i + 1] = np.add(vec_list[i], vec_list[i + 1])
+
+    return vec_list[-1]
 
