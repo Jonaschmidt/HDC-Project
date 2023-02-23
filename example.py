@@ -4,24 +4,23 @@ created by Jonas Schmidt on 2/15/2023
 
 print("IMPORTING...")
 
+import imdb_retriever as imdb
+print("imdb_retriever IMPORTED")
 import hypervector_generation as hgen
 print("hypervector_generation IMPORTED")
-import hypervector_generation_tf as hgen_tf
-print("hypervector_generation_tf IMPORTED")
 import vector_comparison as vcomp
 print("vector_comparison IMPORTED")
-import vector_comparison_tf as vcomp_tf
-print("vector_comparison_tf IMPORTED")
-print("ALL IMPORTS COMPLETED\n")
 
 # measure execution time:
 from timeit import default_timer as timer
+print("timeit IMPORTED")
+print("ALL IMPORTS COMPLETED\n")
 
 print("STARTING TIMER...\n")
 start = timer()
 
 # hyperparameters
-hypervector_size = 10_000_000
+hypervector_size = 10_000
 n_gram_len = 3
 
 # alphabet dictionary
@@ -61,21 +60,14 @@ sentence = ("The quick fox jumps over the lazy brown dog").lower()
 sentence = hgen.scrub(sentence)
 print("SENTENCE SCRUBBED:", sentence, "\n")
 
+n_grams = hgen.decompose_sequence(sentence, n_gram_len)
 
-# generate a dictionary of n-grams based on input sentence
-for s in range(len(sentence) - n_gram_len + 1):
-    curr_gram = sentence[s:s + n_gram_len]
-    n_grams[curr_gram] = []
-
-print("ENCODING N-GRAMS...")
-hgen.encode_n_grams(alphabet, n_grams, n_gram_len)
-print("N-GRAMS ENCODED\n")
+for n in n_grams:
+    n_grams[n] = hgen.encode_n_gram(alphabet, n)
 
 # print statements...
-'''
 for n in n_grams:
     print(n, ":", n_grams[n])
-'''
 # ...
 
 # show_vectors demonstration...
@@ -86,11 +78,16 @@ vcomp.show_vectors(n_grams, dim_show=100, ones=1)
 # ...
 
 # other vcomp/vcomp_tf functions demonstration...
-
-print("Cosine similarity of hypervectors associated with \'a\' and \'b\':", vcomp.cosine_similarity(alphabet['a'], alphabet['b']), "\n")
-print("Hamming distance of of hypervectors associated with \'a\' and \'b\':", vcomp.hamming_similarity(alphabet['a'], alphabet['b']))
-
+print("\nCosine similarity of hypervectors associated with \'a\' and \'b\':", vcomp.cosine_similarity(alphabet['a'], alphabet['b']))
+print("Hamming distance of of hypervectors associated with \'a\' and \'b\':", vcomp.hamming_similarity(alphabet['a'], alphabet['b']), "\n")
 # ...
+
+train_dict = imdb.get_train(3)
+pos_class_hv = []
+neg_class_hv = []
+
+print("Positive Class HV:", pos_class_hv)
+print("Negative Class HV:", pos_class_hv)
 
 print("TIME ELAPSED:", timer() - start, "s")
 

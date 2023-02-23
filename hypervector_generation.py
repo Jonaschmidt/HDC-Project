@@ -25,46 +25,49 @@ def generate_hypervectors(symbol_space, hypervector_size):
     return symbol_space
 
 
-# encode all elements of n_grams across symbol_space
-# (ex. rrT + rH + E, where r represents a rotation operation and T,H,E are elements of an n-gram)
+# generate a dictionary of n-grams based on input sentence
+def decompose_sequence(sequence, n_gram_len):
+    n_grams = {}
+
+    for s in range(len(sequence) - n_gram_len + 1):
+        curr_gram = sequence[s:s + n_gram_len]
+        n_grams[curr_gram] = []
+
+    return n_grams
+
+
+# encode an n_gram
+# returns a hypervector as a list
+# (ex. rrT * rH * E, where r represents a rotation operation and T,H,E are elements of an n-gram)
 # @jit(target='GPU')
-def encode_n_grams(symbol_space, n_grams, n_gram_len):
-    ret_n_grams = {}
+def encode_n_gram(symbol_space, n_gram):
+    r = len(n_gram) - 1
+    mult = []
 
-    # for each n-gram in the n_grams dictionary
-    for n in n_grams:
-        # create / clear a list, mult_vecs, of vectors to multiply
-        mult_vecs = []
-        # (per each n-gram) for each "letter" of the n-gram
-        for i in range(n_gram_len):
-            # find the lex hypervector representation of the letter,
-            # rotate the vector based on its position in the n-gram,
-            # append this rotated vector to mult_vecs
-            mult_vecs.append(np.array(rot(symbol_space[n[i]], n_gram_len - i - 1)))
+    for sym in n_gram:
+        sym = rot(symbol_space[sym], r)
+        mult.append(sym)
 
-        # for each hypervector in mult_vecs, produce a Hadamard product,
-        # define this n-gram by this Hadamard product
-        # (note, len(mult_vecs) is equivalent to n_gram_len in this line)
-        for j in range(len(mult_vecs) - 1):
-            mult_vecs[j + 1] = np.multiply(mult_vecs[j], mult_vecs[j + 1])
+        r -=1
 
-        ret_n_grams[n] = list(mult_vecs[-1])
-        mult_vecs.clear()
+    for j in range(len(mult) - 1):
+        mult[j + 1] = np.multiply(mult[j], mult[j + 1])
 
-    return ret_n_grams
+    return mult[-1]
 
 
 # scrubs a given string as per rules described
 # @jit(target='GPU')
-def scrub(sentence, default_char='#'):
+def scrub(sequence, default_char='#'):
     '''
     input scrubbing rules:
     replace space characters and punctuation with default_character ('#' by default),
     replace resulting duplicate default_character with single default_character
     '''
-    sentence = sentence.replace(" ", default_char)
-    sentence = re.sub(r'[^\w\s]+', default_char, sentence).lower()
-    return sentence
+    sequence = sequence.replace(" ", default_char)
+    sequence = re.sub(r'[\d-]', default_char, sequence)
+    sequence = re.sub(r'[^\w\s]+', default_char, sequence).lower()
+    return sequence
 
 
 # rotate given vector vec by rot_amt to the left
