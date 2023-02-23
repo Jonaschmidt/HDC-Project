@@ -61,19 +61,25 @@ sentence = hgen.scrub(sentence)
 print("SENTENCE SCRUBBED:", sentence, "\n")
 
 n_grams = hgen.decompose_sequence(sentence, n_gram_len)
+n_gram_hv = []
+
+i = 0
 
 for n in n_grams:
-    n_grams[n] = hgen.encode_n_gram(alphabet, n)
+    n_gram_hv.append(hgen.encode_n_gram(alphabet, n))
+    i += 1
+
+i = 0
 
 # print statements...
 for n in n_grams:
-    print(n, ":", n_grams[n])
+    print(n_grams[i], ":", n_gram_hv[i])
+    i += 1
 # ...
 
 # show_vectors demonstration...
 '''
 vcomp.show_vectors(alphabet, dim_show=100, ones=1)
-vcomp.show_vectors(n_grams, dim_show=100, ones=1)
 '''
 # ...
 
@@ -83,11 +89,18 @@ print("Hamming distance of of hypervectors associated with \'a\' and \'b\':", vc
 # ...
 
 train_dict = imdb.get_train(3)
+
+# print statements...
+'''
+print(train_dict.items(), "\n")
+'''
+# ...
+
 pos_class_hv = []
 neg_class_hv = []
 
 print("Positive Class HV:", pos_class_hv)
 print("Negative Class HV:", pos_class_hv)
 
-print("TIME ELAPSED:", timer() - start, "s")
+print("\nTIME ELAPSED:", timer() - start, "s")
 

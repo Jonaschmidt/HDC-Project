@@ -30,7 +30,7 @@ def show_vectors(symbol_space, num_show=64, dim_show=64, ones=1):
 
     fig, ax = plt.subplots()
 
-    # for every element of symbol_space up to num_show or all available...
+    # for every element of dict symbol_space up to num_show or all available...
     for sym in symbol_space:
 
         # ...check if trying to access outside of the symbol-space

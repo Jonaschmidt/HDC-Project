@@ -25,13 +25,14 @@ def generate_hypervectors(symbol_space, hypervector_size):
     return symbol_space
 
 
-# generate a dictionary of n-grams based on input sentence
+# generate a list of n-grams based on input sentence
 def decompose_sequence(sequence, n_gram_len):
-    n_grams = {}
+    n_grams = []
 
+    # for every "n_gram_len" symbols, append to "n_grams"
     for s in range(len(sequence) - n_gram_len + 1):
         curr_gram = sequence[s:s + n_gram_len]
-        n_grams[curr_gram] = []
+        n_grams.append(curr_gram)
 
     return n_grams
 
@@ -44,15 +45,19 @@ def encode_n_gram(symbol_space, n_gram):
     r = len(n_gram) - 1
     mult = []
 
+    # for each symbol in the n_gram, append the symbol-space vector to "mult"
+    # after rotating the vector the appropriate amount
     for sym in n_gram:
         sym = rot(symbol_space[sym], r)
         mult.append(sym)
 
         r -=1
 
+    # multiply (element-wise) each vector in "mult"
     for j in range(len(mult) - 1):
         mult[j + 1] = np.multiply(mult[j], mult[j + 1])
 
+    # return the product of all vetors in "mult", which will be its final element
     return mult[-1]
 
 
