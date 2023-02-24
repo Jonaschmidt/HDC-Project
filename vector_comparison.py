@@ -12,12 +12,13 @@ import matplotlib.pyplot as plt
 # calculate the cosine similarity between vectors a and b of equal length
 # (similarity is of [-1, 1] : [opposite, equal], and 0 implies orthogonality)
 def cosine_similarity(a, b):
+    a = a.flatten()
+    b = b.flatten()
     return np.dot(a, b) / (norm(a) * norm(b))
-
 
 # calculate hamming distance between vectors a and b of equal length
 def hamming_similarity(a, b):
-    return hamming(a, b)
+    return hamming(a.flatten(), b.flatten())
 
 
 # TODO: clean up, add graph labels

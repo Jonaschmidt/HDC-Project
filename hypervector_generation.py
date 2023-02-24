@@ -15,11 +15,11 @@ import re
 # @jit(target='GPU')
 def generate_hypervectors(symbol_space, hypervector_size):
     for symbol in symbol_space:
-        hypervector = []
+        hypervector = np.ones((1, hypervector_size))
         for d in range(hypervector_size):
             ran = random.random()
             # 50/50 append a 1 or -1 to hyper_vector:
-            hypervector.append(-1 + 2 * math.floor(ran + 0.5))
+            hypervector[0][d] = (-1 + 2 * math.floor(ran + 0.5))
 
         symbol_space.update({symbol: hypervector})
     return symbol_space
@@ -81,8 +81,8 @@ def scrub(sequence, default_char='#'):
 def rot(vec, rot_amt):
     vec_size = len(vec)
 
-    rot_vec = vec[rot_amt % vec_size: vec_size]
-    rot_vec.extend(vec[0: rot_amt % vec_size])
+    rot_vec = np.array(vec[rot_amt % vec_size: vec_size])
+    rot_vec = np.concatenate((rot_vec, vec[0: rot_amt % vec_size]), axis=0)
     return rot_vec
 
 
