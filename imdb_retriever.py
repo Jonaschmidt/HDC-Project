@@ -3,7 +3,9 @@ created by Jonas Schmidt on 2/20/2023
 see: https://keras.io/api/datasets/imdb/
 '''
 
+from numba.cuda import jit
 from tensorflow import keras
+import hypervector_generation as hgen
 
 # Use the default parameters to keras.datasets.imdb.load_data
 start_char = 1
@@ -27,21 +29,29 @@ inverted_word_index[oov_char] = "[OOV]"
 
 
 # return a dict of "num" train entries associated with a positive or negative comment
-def get_train(num=1024):
+#@jit(target='cuda')
+def get_train(num=1):
     ret_dict = {}
 
     for i in range(num):
-        ret_dict[(" ".join(inverted_word_index[i] for i in x_train[i]))] = train_label[i]
+        key = hgen.scrub(" ".join(inverted_word_index[i] for i in x_train[i]))
+        # ignore "start#" at the beginning of each entry
+        key = key[7:]
+        ret_dict[key] = train_label[i]
 
     return ret_dict
 
 
 # return a dict of "num" test entries associated with a positive or negative comment
-def get_test(num=1024):
+#@jit(target='cuda')
+def get_test(num=1):
     ret_dict = {}
 
     for i in range(num):
-        ret_dict[(" ".join(inverted_word_index[i] for i in x_test[i]))] = test_label[i]
+        key = hgen.scrub(" ".join(inverted_word_index[i] for i in x_test[i]))
+        # ignore "start#" at the beginning of each entry
+        key = key[7:]
+        ret_dict[key] = test_label[i]
 
     return ret_dict
 

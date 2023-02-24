@@ -2,7 +2,7 @@
 created by Jonas Schmidt on 2/15/2023
 '''
 
-import tensorflow as tf
+from numba.cuda import jit
 import numpy as np
 from numpy.linalg import norm
 from scipy.spatial.distance import hamming
@@ -11,17 +11,20 @@ import matplotlib.pyplot as plt
 
 # calculate the cosine similarity between vectors a and b of equal length
 # (similarity is of [-1, 1] : [opposite, equal], and 0 implies orthogonality)
+#@jit(target='cuda')
 def cosine_similarity(a, b):
     a = a.flatten()
     b = b.flatten()
     return np.dot(a, b) / (norm(a) * norm(b))
 
 # calculate hamming distance between vectors a and b of equal length
+#@jit(target='cuda')
 def hamming_similarity(a, b):
     return hamming(a.flatten(), b.flatten())
 
 
 # TODO: clean up, add graph labels
+#@jit(target='cuda')
 def show_vectors(symbol_space, num_show=64, dim_show=64, ones=1):
     num_sentinel = 0
     dim_sentinel = 0
