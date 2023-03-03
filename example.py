@@ -1,111 +1,73 @@
 '''
-created by Jonas Schmidt on 2/15/2023
+created by Jonas Schmidt on 3/3/2023
 '''
-print("IMPORTING...")
-
 import imdb_retriever as imdb
-print("imdb_retriever IMPORTED")
-from numba.cuda import jit
-print("jit IMPORTED")
+import numpy as np
 import hypervector_generation as hgen
-print("hypervector_generation IMPORTED")
 import vector_comparison as vcomp
-print("vector_comparison IMPORTED")
 
-# measure execution time:
-from timeit import default_timer as timer
-print("timeit IMPORTED")
-print("ALL IMPORTS COMPLETED\n")
+hypervector_size = 10_000
+n_gram_len = 4
 
-#@jit(target='cuda')
-def main():
-    print("STARTING TIMER...\n")
-    start = timer()
+train_num = 100
+test_num = 100
 
-    # hyperparameters
-    hypervector_size = 10_000
-    n_gram_len = 3
+alphabet = {'a': [], 'b': [], 'c': [], 'd': [], 'e': [],
+            'f': [], 'g': [], 'h': [], 'i': [], 'j': [],
+            'k': [], 'l': [], 'm': [], 'n': [], 'o': [],
+            'p': [], 'q': [], 'r': [], 's': [], 't': [],
+            'u': [], 'v': [], 'w': [], 'x': [], 'y': [],
+            'z': [], '#': []}
+num_seed_vectors = len(alphabet)
 
-    # alphabet dictionary
-    # note that '#' character is a default
-    alphabet = {'a':[],'b':[],'c':[],'d':[],'e':[],
-                'f':[],'g':[],'h':[],'i':[],'j':[],
-                'k':[],'l':[],'m':[],'n':[],'o':[],
-                'p':[],'q':[],'r':[],'s':[],'t':[],
-                'u':[],'v':[],'w':[],'x':[],'y':[],
-                'z':[],'#':[]}
-    num_seed_vectors = len(alphabet)
+alphabet = hgen.generate_hypervectors(alphabet, hypervector_size)
 
-    print("ENCODING SYMBOL-SPACE...")
-    ### generating seed hypervectors for atomic elements
-    alphabet = hgen.generate_hypervectors(alphabet, hypervector_size)
-    print("SYMBOL-SPACE ENCODED\n")
+train_dict = imdb.get_train(train_num)
+test_dict = imdb.get_test(test_num)
 
-    # print statements...
-    '''
-    for letter in alphabet:
-        print(letter, ":", alphabet[letter])
-    '''
-    # ...
+POS_CLASS = np.zeros(hypervector_size)
+NEG_CLASS = np.zeros(hypervector_size)
 
-    ### generating hypervectors for n-grams
-    # initialize n_grams dictionary as an empty dictionary object
-    n_grams = {}
+print("training...")
+for sequence in enumerate(train_dict):
+    sequence = sequence[1]
+    seq = hgen.scrub(sequence)
+    seq = hgen.decompose_sequence(seq, n_gram_len)
 
-    # user input for debugging:
-    '''
-    sentence = input("Enter a sentence to decompose into n-grams: ").lower()
-    sentence = hgen.scrub(sentence)
-    '''
-    print("SCRUBBING SENTENCE...")
-    # test input for debugging:
-    sentence = ("The quick fox jumps over the lazy brown dog").lower()
-    sentence = hgen.scrub(sentence)
-    print("SENTENCE SCRUBBED:", sentence, "\n")
+    for n in enumerate(seq):
+        seq[n[0]] = hgen.encode_n_gram(alphabet, n[1])
 
-    n_grams = hgen.decompose_sequence(sentence, n_gram_len)
-    n_gram_hv = []
+    acc = np.array(sum(seq))[0]
 
-    i = 0
+    if train_dict[sequence] == 0:
+        NEG_CLASS = hgen.sum([NEG_CLASS, acc])
+    else:
+        POS_CLASS = hgen.sum([POS_CLASS, acc])
 
-    for n in n_grams:
-        n_gram_hv.append(hgen.encode_n_gram(alphabet, n))
-        i += 1
+POS_CLASS = hgen.binarize(POS_CLASS)
+NEG_CLASS = hgen.binarize(NEG_CLASS)
 
-    i = 0
+correct = 0
 
-    # print statements...
-    for n in n_grams:
-        print(n_grams[i], ":", n_gram_hv[i])
-        i += 1
-    # ...
+print("testing...")
+for sequence in enumerate(test_dict):
+    sequence = sequence[1]
+    seq = hgen.scrub(sequence)
+    seq = hgen.decompose_sequence(seq, n_gram_len)
 
-    # show_vectors demonstration...
-    '''
-    vcomp.show_vectors(alphabet, dim_show=100, ones=1)
-    '''
-    # ...
+    for n in enumerate(seq):
+        seq[n[0]] = hgen.encode_n_gram(alphabet, n[1])
 
-    # other vcomp/vcomp_tf functions demonstration...
-    print("\nCosine similarity of hypervectors associated with \'a\' and \'b\':", vcomp.cosine_similarity(alphabet['a'], alphabet['b']))
-    print("Hamming distance of of hypervectors associated with \'a\' and \'b\':", vcomp.hamming_similarity(alphabet['a'], alphabet['b']), "\n")
-    # ...
+    acc = np.array(sum(seq))[0]
 
-    train_dict = imdb.get_train(3)
+    if(vcomp.cosine_similarity(NEG_CLASS, acc) > vcomp.cosine_similarity(POS_CLASS, acc)):
+        prediction = 0
+    else:
+        prediction = 1
 
-    # print statements...
-    '''
-    print(train_dict.items(), "\n")
-    '''
-    # ...
+    actual = test_dict[sequence]
+    if(prediction == actual):
+        correct += 1
 
-    pos_class_hv = []
-    neg_class_hv = []
-
-    print("Positive Class HV:", pos_class_hv)
-    print("Negative Class HV:", pos_class_hv)
-
-    print("\nTIME ELAPSED:", timer() - start, "s")
-
-main()
+print("accuracy (%):", (correct / test_num) * 100)
 
