@@ -1,12 +1,15 @@
 '''
 created by Jonas Schmidt on 3/3/2023
 '''
+from sys import maxsize
 import imdb_retriever as imdb
 import numpy as np
 import hypervector_generation as hgen
 import vector_comparison as vcomp
 
-hypervector_size = 10_000
+np.set_printoptions(threshold=maxsize)
+
+hypervector_size = 8_000
 n_gram_len = 4
 
 train_num = 100
@@ -34,6 +37,7 @@ NEG_CLASS = np.zeros(hypervector_size)
 # train
 print("training...")
 for sequence in enumerate(train_dict):
+    #print(sequence[0])
     sequence = sequence[1]
 
     # scrub and decompose sequence into n-grams
@@ -44,20 +48,23 @@ for sequence in enumerate(train_dict):
     for n in enumerate(seq):
         seq[n[0]] = hgen.encode_n_gram(alphabet, n[1])
 
+    # TODO: I believe the bug is here:
     # accumulate the vectors
-    acc = np.array(sum(seq))[0]
+    acc = np.array(hgen.sum_vec(seq))[0]
+    # FIX: acc != np.array(hgen.sum_vec(seq[0]))
 
     # add accumulated vectors to their respective classes
     if train_dict[sequence] == 0:
-        NEG_CLASS = hgen.sum([NEG_CLASS, acc])
+        NEG_CLASS = hgen.sum_vec([NEG_CLASS, acc])
     else:
-        POS_CLASS = hgen.sum([POS_CLASS, acc])
+        POS_CLASS = hgen.sum_vec([POS_CLASS, acc])
 
+
+# test
 # binarize classes for testing
 POS_CLASS = hgen.binarize(POS_CLASS)
 NEG_CLASS = hgen.binarize(NEG_CLASS)
 
-# test
 correct = 0
 
 print("testing...")
