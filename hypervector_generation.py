@@ -8,6 +8,7 @@ import math
 import random
 import numpy as np
 import re
+import unicodedata
 
 
 # generate a seed vector (list) to assign to each dictionary entry of a symbol-space
@@ -72,6 +73,8 @@ def scrub(sequence, default_char='#'):
     sequence = sequence.replace(" ", default_char)
     sequence = re.sub(r'[\d-]', default_char, sequence)
     sequence = re.sub(r'[^\w\s]+', default_char, sequence).lower()
+    sequence = unicodedata.normalize('NFKD', sequence).encode('ASCII', 'ignore').decode('UTF-8')
+
     return sequence
 
 
@@ -88,10 +91,19 @@ def rot(vec, rot_amt):
 
 # sums vectors in a given list
 #@jit(target='cuda')
-def sum(vec_list):
+def sum_vec(vec_list):
     for i in range(len(vec_list) - 1):
         #print(vec_list[i + 1], vec_list[i])
         vec_list[i + 1] = np.add(vec_list[i], vec_list[i + 1])
 
     return vec_list[-1]
 
+
+def binarize(vec):
+    for ele in enumerate(vec):
+        if ele[1] > 0:
+            vec[ele[0]] = 1
+        else:
+            vec[ele[0]] = 0
+
+    return vec

@@ -95,4 +95,3 @@ for sequence in enumerate(test_dict):
 
 # output percent correct
 print("accuracy (%):", (correct / test_num) * 100)
-
