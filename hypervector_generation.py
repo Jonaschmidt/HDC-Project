@@ -2,8 +2,6 @@
 created by Jonas Schmidt on 2/8/2023
 '''
 
-from numba.cuda import jit
-import tensorflow as tf
 import math
 import random
 import numpy as np
@@ -13,7 +11,6 @@ import unicodedata
 
 # generate a seed vector (list) to assign to each dictionary entry of a symbol-space
 # e.g., generate a hypervector for each letter of the alphabet if symbol_space is the alphabet
-#@jit(target='cuda')
 def generate_hypervectors(symbol_space, hypervector_size):
     for symbol in symbol_space:
         hypervector = np.ones((1, hypervector_size))
@@ -41,7 +38,6 @@ def decompose_sequence(sequence, n_gram_len):
 # encode an n_gram
 # returns a hypervector as a list
 # (ex. rrT * rH * E, where r represents a rotation operation and T,H,E are elements of an n-gram)
-#@jit(target='cuda')
 def encode_n_gram(symbol_space, n_gram):
     r = len(n_gram) - 1
     mult = []
@@ -63,7 +59,6 @@ def encode_n_gram(symbol_space, n_gram):
 
 
 # scrubs a given string as per rules described
-#@jit(target='cuda')
 def scrub(sequence, default_char='#'):
     '''
     input scrubbing rules:
@@ -80,7 +75,6 @@ def scrub(sequence, default_char='#'):
 
 # rotate given vector vec by rot_amt to the left
 # e.g., rot([1,2,3,4], 2) returns [3,4,1,2]
-#@jit(target='cuda')
 def rot(vec, rot_amt):
     vec_size = len(vec)
 
@@ -90,10 +84,8 @@ def rot(vec, rot_amt):
 
 
 # sums vectors in a given list
-#@jit(target='cuda')
 def sum_vec(vec_list):
     for i in range(len(vec_list) - 1):
-        #print(vec_list[i + 1], vec_list[i])
         vec_list[i + 1] = np.add(vec_list[i], vec_list[i + 1])
 
     return vec_list[-1]
@@ -101,7 +93,7 @@ def sum_vec(vec_list):
 
 def binarize(vec):
     for ele in enumerate(vec):
-        if ele[1] > 0:
+        if ele[1][ele[0]] > 0:
             vec[ele[0]] = 1
         else:
             vec[ele[0]] = 0
