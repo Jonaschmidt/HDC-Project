@@ -1,17 +1,11 @@
 '''
-created by Jonas Schmidt on 3/3/2023
+created by Jonas Schmidt on 3/17/2023
 '''
-from sys import maxsize
-import imdb_retriever as imdb
 import numpy as np
 import hypervector_generation as hgen
 import vector_comparison as vcomp
 
 #np.set_printoptions(threshold=maxsize)
-
-file = open("WiLI-2018/x_train.txt", "r", encoding='utf-8')
-train = file.readlines()
-file.close()
 
 hypervector_size = 8_000
 n_gram_len = 4
@@ -37,10 +31,10 @@ TUR_CLASS = np.zeros(hypervector_size)
 print("training...")
 
 # English:
-eng = hgen.scrub(train[269])
+eng = hgen.scrub("In 1978 Johnson was awarded an American Institute of Architects Gold Medal. In 1979 he became the first recipient of the Pritzker Architecture Prize the most prestigious international architectural award.")
 #print(eng)
 
-tur = hgen.scrub(train[38])
+tur = hgen.scrub("Tsutinalar (İngilizce: Tsuut'ina): Kanada'da Alberta bölgesinde Calgary'de yaşarlar. Tek başına grup oluştururlar ve Pasifik ve Güney Atabaskları ile antik yakınlıklar göstermiştir.")
 #print(tur)
 
 eng = hgen.scrub(eng)
