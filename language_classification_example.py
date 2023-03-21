@@ -5,20 +5,19 @@ import numpy as np
 import hypervector_generation as hgen
 import vector_comparison as vcomp
 
-#np.set_printoptions(threshold=maxsize)
-
+# hyperparameters
 hypervector_size = 8_000
 n_gram_len = 4
-
 train_num = 100
 test_num = 50
 
+# define the symbol space
 alphabet = {'a': [], 'b': [], 'c': [], 'd': [], 'e': [],
             'f': [], 'g': [], 'h': [], 'i': [], 'j': [],
             'k': [], 'l': [], 'm': [], 'n': [], 'o': [],
             'p': [], 'q': [], 'r': [], 's': [], 't': [],
             'u': [], 'v': [], 'w': [], 'x': [], 'y': [],
-            'z': [], "\n":[], '#': []}
+            'z': [], '\n':[], '#': []}
 
 # generate hypervectors for symbols
 alphabet = hgen.generate_hypervectors(alphabet, hypervector_size)
@@ -30,13 +29,13 @@ TUR_CLASS = np.zeros(hypervector_size)
 # train
 print("training...")
 
-# English:
-eng = hgen.scrub("In 1978 Johnson was awarded an American Institute of Architects Gold Medal. In 1979 he became the first recipient of the Pritzker Architecture Prize the most prestigious international architectural award.")
-#print(eng)
+eng = hgen.scrub("In 1978 Johnson was awarded an American Institute of Architects Gold Medal. In 1979 he became the "
+                 "first recipient of the Pritzker Architecture Prize the most prestigious international architectural"
+                 " award.")
+tur = hgen.scrub("Tsutinalar (İngilizce: Tsuut'ina): Kanada'da Alberta bölgesinde Calgary'de yaşarlar. Tek başına "
+                 "grup oluştururlar ve Pasifik ve Güney Atabaskları ile antik yakınlıklar göstermiştir.")
 
-tur = hgen.scrub("Tsutinalar (İngilizce: Tsuut'ina): Kanada'da Alberta bölgesinde Calgary'de yaşarlar. Tek başına grup oluştururlar ve Pasifik ve Güney Atabaskları ile antik yakınlıklar göstermiştir.")
-#print(tur)
-
+### Train on English paragraph
 eng = hgen.scrub(eng)
 eng = hgen.decompose_sequence(eng, n_gram_len)
 
@@ -44,11 +43,12 @@ eng = hgen.decompose_sequence(eng, n_gram_len)
 for n in enumerate(eng):
     eng[n[0]] = hgen.encode_n_gram(alphabet, n[1])
 
+# accumulate the n-grams
 acc = np.array(hgen.sum_vec(eng))
 
 ENG_CLASS = hgen.sum_vec([ENG_CLASS, acc])[0]
 
-# Turkish:
+### Train on Turkish paragraph
 tur = hgen.scrub(tur)
 tur = hgen.decompose_sequence(tur, n_gram_len)
 
@@ -56,14 +56,12 @@ tur = hgen.decompose_sequence(tur, n_gram_len)
 for n in enumerate(tur):
     tur[n[0]] = hgen.encode_n_gram(alphabet, n[1])
 
+# accumulate the n-grams
 acc = np.array(hgen.sum_vec(tur))
 
 TUR_CLASS = hgen.sum_vec([TUR_CLASS, acc])[0]
 
-#print("Class hypervector for English:", ENG_CLASS)
-#print("Class hypervector for Turkish:", TUR_CLASS, "\n")
-
-print("Cosine sim:", vcomp.cosine_similarity(ENG_CLASS, TUR_CLASS))
+#print("Cosine sim:", vcomp.cosine_similarity(ENG_CLASS, TUR_CLASS))
 
 user_in = hgen.scrub(input("Enter an English or Turkish sentence, or 'exit' to exit: "))
 
@@ -75,6 +73,7 @@ while user_in != 'exit':
     for n in enumerate(user_in):
         user_in[n[0]] = hgen.encode_n_gram(alphabet, n[1])
 
+    # accumulate the n-grams
     acc = np.array(hgen.sum_vec(user_in))
 
     user_in_vec = hgen.sum_vec([user_in_vec, acc])[0]
@@ -87,3 +86,4 @@ while user_in != 'exit':
     print("Prediction:", prediction, "\n")
 
     user_in = hgen.scrub(input("Enter an English or Turkish sentence, or 'exit' to exit: "))
+
