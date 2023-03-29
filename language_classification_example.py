@@ -30,32 +30,26 @@ alphabet = hgen.generate_hypervectors(alphabet, hypervector_size)
 ENG_CLASS = np.zeros(hypervector_size)
 TUR_CLASS = np.zeros(hypervector_size)
 
+train_set, test_set = ta.load_data(train_num, test_num)
+
 # train
 print("training...")
-
-train_set, test_set = ta.load_data(train_num, test_num)
 
 for i in range(train_num):
     curr_label = train_set[i][0]
     curr_seq = train_set[i][1]
 
-    # TODO: make this an np array?
-    vec = []
+    n_gram_list = hgen.decompose_sequence(curr_seq, n_gram_len)
 
-    # encode the n-grams
-    for n in enumerate(curr_seq):
-        vec.append(hgen.encode_n_gram(alphabet, n[1]))
+    acc = np.zeros(hypervector_size)
 
-    # accumulate the n-grams
-    acc = np.array(hgen.sum_vec(vec))
+    for i in n_gram_list:
+        acc = hgen.sum_vec([acc, hgen.encode_n_gram(alphabet, i)])
 
     if curr_label == "tur":
-        TUR_CLASS = hgen.sum_vec([acc, TUR_CLASS])
+        TUR_CLASS = hgen.sum_vec([acc, TUR_CLASS])[0]
     else:
-        ENG_CLASS = hgen.sum_vec([acc, ENG_CLASS])
-
-TUR_CLASS = TUR_CLASS[0]
-ENG_CLASS = ENG_CLASS[0]
+        ENG_CLASS = hgen.sum_vec([acc, ENG_CLASS])[0]
 
 print("TUR_CLASS =", TUR_CLASS)
 print("ENG_CLASS =", ENG_CLASS)
@@ -79,7 +73,7 @@ for seq in test_set:
     for i in n_gram_list:
         test_hypervector = hgen.sum_vec([test_hypervector, hgen.encode_n_gram(alphabet, i)])
 
-    if vcomp.cosine_similarity(test_hypervector, TUR_CLASS) > vcomp.cosine_similarity(test_hypervector, ENG_CLASS):
+    if vcomp.cosine_similarity(test_hypervector, TUR_CLASS) < vcomp.cosine_similarity(test_hypervector, ENG_CLASS):
         prediction = "eng"
 
     if prediction == seq[0]:
