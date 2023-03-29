@@ -90,12 +90,3 @@ def sum_vec(vec_list):
 
     return vec_list[-1]
 
-
-def binarize(vec):
-    for ele in enumerate(vec):
-        if ele[1][ele[0]] > 0:
-            vec[ele[0]] = 1
-        else:
-            vec[ele[0]] = 0
-
-    return vec

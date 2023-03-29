@@ -7,18 +7,30 @@ from numpy.linalg import norm
 from scipy.spatial.distance import hamming
 import matplotlib.pyplot as plt
 
-
 # calculate the cosine similarity between vectors a and b of equal length
 # (similarity is of [-1, 1] : [opposite, equal], and 0 implies orthogonality)
 def cosine_similarity(a, b):
-    a = a.flatten()
-    b = b.flatten()
-    return np.dot(a, b) / (norm(a) * norm(b))
+    if (np.count_nonzero(a) == 0 or np.count_nonzero(b) == 0):
+        return 0.0
+    elif (np.isnan(a).any() or np.isnan(b).any()):
+        return 0.0
+    else:
+        return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
 # calculate hamming distance between vectors a and b of equal length
 def hamming_similarity(a, b):
     return hamming(a.flatten(), b.flatten())
+
+
+def binarize(vec):
+    for i, val in enumerate(vec):
+        if val > 0:
+            vec[i] = 1
+        else:
+            vec[i] = 0
+
+    return vec
 
 
 # TODO: clean up, add graph labels

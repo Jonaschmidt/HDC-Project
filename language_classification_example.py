@@ -12,7 +12,7 @@ import tatoeba_access as ta
 # hyperparameters
 hypervector_size = 8_000
 n_gram_len = 4
-train_num = 100
+train_num = 1_000
 test_num = 50
 
 # define the symbol space
@@ -30,6 +30,7 @@ alphabet = hgen.generate_hypervectors(alphabet, hypervector_size)
 ENG_CLASS = np.zeros(hypervector_size)
 TUR_CLASS = np.zeros(hypervector_size)
 
+# load training and testing data
 train_set, test_set = ta.load_data(train_num, test_num)
 
 # train
@@ -51,14 +52,10 @@ for i in range(train_num):
     else:
         ENG_CLASS = hgen.sum_vec([acc, ENG_CLASS])[0]
 
-print("TUR_CLASS =", TUR_CLASS)
-print("ENG_CLASS =", ENG_CLASS)
+vcomp.binarize(TUR_CLASS)
+vcomp.binarize(ENG_CLASS)
 
-hgen.binarize(TUR_CLASS)
-hgen.binarize(ENG_CLASS)
-
-print(vcomp.cosine_similarity(TUR_CLASS, ENG_CLASS))
-
+# test
 print("testing...")
 
 accu = 0
