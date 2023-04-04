@@ -1,6 +1,7 @@
 '''
 created by Jonas Schmidt on 3/31/2023
 '''
+print("importing...")
 import tensorflow as tf
 import numpy as np
 import hypervector_generation_tf as hgen
@@ -32,9 +33,11 @@ TUR_CLASS = np.zeros(hypervector_size)
 train_set, test_set = ta.load_data(train_num, test_num)
 
 # train
-print("training...")
+print("training...", end=' ')
 
 for i in range(train_num):
+    print('#' * (-1 * (i % (train_num // 10)) + 1), end='')
+
     curr_label = train_set[i][0]
     curr_seq = train_set[i][1]
 
@@ -55,14 +58,16 @@ vcomp.binarize(TUR_CLASS)
 vcomp.binarize(ENG_CLASS)
 
 # test
-print("testing...")
+print("\ntesting...", end="  ")
 
 accu = 0
 
-for seq in test_set:
+for seq in enumerate(test_set):
+    print('#' * (-1 * (seq[0] % (test_num // 10)) + 1), end = '')
+
     prediction = "tur"
 
-    n_gram_list = hgen.decompose_string(seq[1], n_gram_len)
+    n_gram_list = hgen.decompose_string(seq[1][1], n_gram_len)
 
     test_hypervector = tf.zeros(hypervector_size)
 
@@ -72,7 +77,7 @@ for seq in test_set:
     if vcomp.cosine_similarity(test_hypervector, TUR_CLASS) < vcomp.cosine_similarity(test_hypervector, ENG_CLASS):
         prediction = "eng"
 
-    if prediction == seq[0]:
+    if prediction == seq[1][0]:
         accu += 1
 
-print("Accuracy (%):", 100 * accu / test_num)
+print("\nAccuracy (%):", 100 * accu / test_num)
