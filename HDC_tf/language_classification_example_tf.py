@@ -2,8 +2,8 @@
 created by Jonas Schmidt on 3/31/2023
 '''
 print("importing...")
+
 import tensorflow as tf
-import numpy as np
 import hypervector_generation_tf as hgen
 import vector_comparison_tf as vcomp
 import tatoeba_access as ta
@@ -26,8 +26,8 @@ alphabet = {'a': [], 'b': [], 'c': [], 'd': [], 'e': [],
 alphabet = hgen.generate_hypervectors(alphabet, hypervector_size)
 
 # initialize class hypervectors as zero vectors
-ENG_CLASS = np.zeros(hypervector_size)
-TUR_CLASS = np.zeros(hypervector_size)
+ENG_CLASS = tf.zeros(hypervector_size)
+TUR_CLASS = tf.zeros(hypervector_size)
 
 # load training and testing data
 train_set, test_set = ta.load_data(train_num, test_num)
