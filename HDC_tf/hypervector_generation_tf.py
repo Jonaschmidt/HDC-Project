@@ -17,8 +17,29 @@ def generate_hypervectors(symbol_space, hypervector_size):
                                           seed=None,
                                           name=None)
 
-        symbol_space.update({symbol: tf.where(random_tensor > 0, tf.ones(shape=[hypervector_size]),
+        symbol_space.update({symbol : tf.where(random_tensor > 0, tf.ones(shape=[hypervector_size]),
                                               -1 * tf.ones(shape=[hypervector_size]))})
+    return symbol_space
+
+
+# generate correlated seed vectors of a dictionary such that each symbol gets a number of positive ones per it's position
+# i.e., the first entry will have a correlated vector with all -1's, the last entry vice versa
+def generate_correlated_hypervectors(symbol_space, hypervector_size):
+    for symbol in enumerate(symbol_space):
+        # define the number of 1's to insert
+        num_ones = int(hypervector_size * symbol[0] / (len(symbol_space) - 1))
+
+        # create a vector full of -1's
+        corr_vec = tf.constant([-1] * hypervector_size)
+
+        # choose random indices to insert 1's
+        indices = tf.random.shuffle(tf.range(hypervector_size))[:num_ones]
+
+        # replace the values at the chosen indices with 1's
+        updates = tf.ones(num_ones, dtype=tf.int32)
+        corr_vec = tf.tensor_scatter_nd_update(corr_vec, tf.expand_dims(indices, 1), updates)
+
+        symbol_space.update({symbol[1] : corr_vec})
     return symbol_space
 
 
