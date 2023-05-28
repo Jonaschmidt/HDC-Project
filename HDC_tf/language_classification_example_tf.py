@@ -1,6 +1,11 @@
 '''
 created by Jonas Schmidt on 3/31/2023
 '''
+
+from timeit import default_timer
+
+start = default_timer()
+
 print("importing...")
 
 import tensorflow as tf
@@ -9,7 +14,7 @@ import vector_comparison_tf as vcomp
 import tatoeba_access as ta
 
 # hyperparameters
-hypervector_size = 8_000
+hypervector_size = 1_000
 n_gram_len = 4
 train_num = 100
 test_num = 50
@@ -23,7 +28,7 @@ alphabet = {'a': [], 'b': [], 'c': [], 'd': [], 'e': [],
             'z': [], '\n':[], '#': []}
 
 # generate hypervectors for symbols
-alphabet = hgen.generate_hypervectors(alphabet, hypervector_size)
+alphabet = hgen.generate_orthogonal_hypervectors(alphabet, hypervector_size)
 
 # initialize class hypervectors as zero vectors
 ENG_CLASS = tf.zeros(hypervector_size)
@@ -81,3 +86,6 @@ for seq in enumerate(test_set):
         accu += 1
 
 print("\nAccuracy (%):", 100 * accu / test_num)
+
+print("Time: ", default_timer() - start, "s", sep='')
+

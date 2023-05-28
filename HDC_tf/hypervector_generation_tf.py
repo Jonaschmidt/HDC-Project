@@ -6,9 +6,9 @@ import unicodedata
 import re
 
 
-# generate a seed vector (1-D tensor) to assign to each dictionary entry of a symbol-space
+# generate orthogonal seed vectors (1-D tensors) to assign to each dictionary entry of a symbol-space
 # e.g., generate a hypervector for each letter of the alphabet if symbol_space is the alphabet
-def generate_hypervectors(symbol_space, hypervector_size):
+def generate_orthogonal_hypervectors(symbol_space, hypervector_size):
     for symbol in symbol_space:
         random_tensor = tf.random.uniform(shape=[hypervector_size],
                                           minval=0,
@@ -76,7 +76,6 @@ def scrub_string(string, default_char='#'):
     return string
 
 
-# TODO: test this for accuracy
 # encode an n_gram
 # returns a hypervector as a list
 # (e.g., rrT * rH * E, where r represents a rotation operation and T,H,E are elements of an n-gram)

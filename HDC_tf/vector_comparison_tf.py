@@ -3,6 +3,7 @@ created by Jonas Schmidt on 3/31/2023
 '''
 import tensorflow as tf
 
+
 # convert the vector to a binary vector based on the values of the vector,
 # if a value positive and non-zero, it will be changed to 1, otherwise 0
 def binarize(in_vec):

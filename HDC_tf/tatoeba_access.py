@@ -1,5 +1,5 @@
 '''
-created by Jonas Schmidt on 3/22/23
+created by Jonas Schmidt on 3/22/2023
 '''
 
 # Uses the Tatoeba dataset: https://tatoeba.org/en/downloads
