@@ -2,6 +2,12 @@
 created by Jonas Schmidt on 3/31/2023
 '''
 
+'''
+This program takes language data from the tatoeba dataset of English and Turkish sentences.
+The algorithm then trains on this data.
+The program then classifies the languages and outputs its test accuracy.
+'''
+
 from timeit import default_timer
 
 start = default_timer()
